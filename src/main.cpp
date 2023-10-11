@@ -15,6 +15,7 @@ Erstellt am 09.10.2023
 #include "Wire.h"
 #include "SSD1306Wire.h"
 #include "readEKG.h"
+#include "Wifi.h"
 
 #define EKG_SAMPLING_TIME 100
 
@@ -32,6 +33,9 @@ float sinusValue = 0;
 uint8_t freque = 1;         // Frequenz vom Sinus, aktuell 1Hz       
 uint8_t dacValue = 0;
 uint16_t adcValue = 0;
+const char* wifiSSID = "FRITZ!Box 7590 VL";
+const char* wifiPAS = "56616967766283031728";
+String wifiCon = "Connecting to WiFi";
 
 /* Klassen */
 TaskHandle_t TaskWriteSinus;      // Task
@@ -42,9 +46,13 @@ void setup();
 void loop();
 void timerInit();
 void IRAM_ATTR onTimer();
+void wifiInit();
 
 void setup()
 {
+
+  wifiInit();
+
   timerInit();
 
   Serial.begin(115200);
@@ -105,4 +113,41 @@ void writeSinus(void *parameter)
     dacValue = int(sinusValue * 127.0 + 127.0);
     dacWrite(25, dacValue);
   }
+}
+
+void wifiInit()
+{
+  myDisplay.setTextAlignment(TEXT_ALIGN_CENTER);
+
+  uint8_t indexWait = 0;
+  uint8_t indexDot = 0;
+
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(wifiSSID, wifiPAS);
+  
+  do {
+
+    if(indexDot == 3)
+    {
+      wifiCon = "Connecting to WiFi";
+    }
+
+    myDisplay.drawString(64, 32, wifiCon);
+    wifiCon += ".";
+
+    delay(1000);
+
+    indexWait++;
+    indexDot++;
+
+  } while (WiFi.status() != WL_CONNECTED or indexWait == 30);
+
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    myDisplay.drawString(64, 32, "WOW, you are connected!");
+  }
+  else{
+    myDisplay.drawString(64, 32, "OOO, you are not Connected!" + WiFi.status());
+  }
+
 }
