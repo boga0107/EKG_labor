@@ -14,6 +14,9 @@ Erstellt am 09.10.2023
 #include <math.h>
 #include "Wire.h"
 #include "SSD1306Wire.h"
+#include "readEKG.h"
+
+#define EKG_SAMPLING_TIME 100
 
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
@@ -32,13 +35,13 @@ uint16_t adcValue = 0;
 
 /* Klassen */
 TaskHandle_t TaskWriteSinus;      // Task
+readEKG myEKG;
 
 /* Funktionen */
 void setup();
 void loop();
 void timerInit();
 void IRAM_ATTR onTimer();
-void writeSinus(void *parameter);
 
 void setup()
 {
@@ -58,19 +61,19 @@ void loop()
   /* Alle 20ms wird ein Pixel erstellt. */
   if (flagRead)
   {
-    adcValue = analogRead(33);
-    adcValue = map(adcValue, 0, 4095, 55, 10);
-    myDisplay.setPixel(posX, adcValue);
-    myDisplay.display();
-    posX++;
-    flagRead = false;
+    // myEKG.getValue(adcValue);
+    // adcValue = map(adcValue, 0, 4095, 55, 10);
+    // myDisplay.setPixel(posX, adcValue);
+    // myDisplay.display();
+    // posX++;
+    // flagRead = false;
   }
   /* Nach 2,5sek wird der Display zurück gesetzt */
-  if (posX == 128)
-  {
-    posX = 0;
-    myDisplay.clear();
-  }
+  // if (posX == 128)
+  // {
+  //   posX = 0;
+  //   myDisplay.clear();
+  // }
 }
 
 void timerInit()
@@ -87,6 +90,9 @@ void IRAM_ATTR onTimer()
   if (counterms % 20 == 0)
   {
     flagRead = true;
+  }
+  if(counterms % EKG_SAMPLING_TIME== 0){
+    myEKG.measure();
   }
 }
 
