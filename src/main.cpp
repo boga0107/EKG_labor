@@ -1,7 +1,7 @@
 /*
 Projekt: EKG-Labor
 Aufagenstellung:
-Ziel des Labors ist der Entwurf einer Signalverarbeitungskette in einem Mikrocontroller anhand eines EKG-Rekorders. 
+Ziel des Labors ist der Entwurf einer Signalverarbeitungskette in einem Mikrocontroller anhand eines EKG-Rekorders.
 Hierzu sollen EKG-Daten aufgenommen und über WLAN an einen PC übertragen werden. Die Verarbeitung der Daten findet teilweise
 im Controller und teilweise auf dem PC in MATLAB statt.
 
@@ -28,18 +28,18 @@ uint8_t posX = 0;
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
 
 /* Sonstige Variablen */
-bool flagRead = false;      // Scheduling - Timer-Interrupt
+bool flagRead = false; // Scheduling - Timer-Interrupt
 float sinusValue = 0;
-uint8_t freque = 1;         // Frequenz vom Sinus, aktuell 1Hz       
+uint8_t freque = 1; // Frequenz vom Sinus, aktuell 1Hz
 uint8_t dacValue = 0;
 uint16_t adcValue = 0;
-const char* wifiSSID = "FRITZ!Box 7590 VL";
-const char* wifiPAS = "56616967766283031728";
+const char *wifiSSID = "FRITZ!Box 7590 VL";
+const char *wifiPAS = "56616967766283031728";
 String wifiCon = "Connecting to WiFi";
 
 /* Klassen */
-TaskHandle_t TaskWriteSinus;      // Task
-readEKG myEKG;
+TaskHandle_t TaskWriteSinus; // Task
+// readEKG myEKG;
 
 /* Funktionen */
 void setup();
@@ -51,8 +51,6 @@ void wifiInit();
 void setup()
 {
 
-  wifiInit();
-
   timerInit();
 
   Serial.begin(115200);
@@ -60,7 +58,7 @@ void setup()
   myDisplay.init();
   myDisplay.flipScreenVertically();
 
-  xTaskCreate(writeSinus, "Write Sinus", 1000, NULL, 1, &TaskWriteSinus);
+  wifiInit();
 }
 
 /* Hauptprogramm - Loop */
@@ -99,24 +97,15 @@ void IRAM_ATTR onTimer()
   {
     flagRead = true;
   }
-  if(counterms % EKG_SAMPLING_TIME== 0){
-    myEKG.measure();
-  }
-}
-
-void writeSinus(void *parameter)
-{
-  for (;;)
+  if (counterms % EKG_SAMPLING_TIME == 0)
   {
-    /* Sinus, 1Hz */
-    sinusValue = sin(2.0 * PI * freque * millis() / 1000.0);
-    dacValue = int(sinusValue * 127.0 + 127.0);
-    dacWrite(25, dacValue);
+    // myEKG.measure();
   }
 }
 
 void wifiInit()
 {
+  myDisplay.clear();
   myDisplay.setTextAlignment(TEXT_ALIGN_CENTER);
 
   uint8_t indexWait = 0;
@@ -124,30 +113,39 @@ void wifiInit()
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(wifiSSID, wifiPAS);
-  
-  do {
 
-    if(indexDot == 3)
+  do
+  {
+    myDisplay.clear();
+    if (indexDot == 4)
     {
       wifiCon = "Connecting to WiFi";
+      indexDot = 0;
     }
 
     myDisplay.drawString(64, 32, wifiCon);
     wifiCon += ".";
+    myDisplay.display();
 
     delay(1000);
 
     indexWait++;
     indexDot++;
 
-  } while (WiFi.status() != WL_CONNECTED or indexWait == 30);
+  } while (indexWait < 30);
 
-  if(WiFi.status() != WL_CONNECTED)
+  if (WiFi.status() == WL_CONNECTED)
   {
-    myDisplay.drawString(64, 32, "WOW, you are connected!");
-  }
-  else{
-    myDisplay.drawString(64, 32, "OOO, you are not Connected!" + WiFi.status());
-  }
+    myDisplay.clear();
 
+    myDisplay.drawString(64, 32, "WOW, you are connected!");
+    myDisplay.display();
+  }
+  else
+  {
+    myDisplay.clear();
+
+    myDisplay.drawString(64, 32, "OOO, you are not Connected!" + WiFi.status());
+    myDisplay.display();
+  }
 }
