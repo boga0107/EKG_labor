@@ -33,9 +33,12 @@ float sinusValue = 0;
 uint8_t freque = 1; // Frequenz vom Sinus, aktuell 1Hz
 uint8_t dacValue = 0;
 uint16_t adcValue = 0;
-const char *wifiSSID = "FRITZ!Box 7590 VL";
-const char *wifiPAS = "56616967766283031728";
+// const char *wifiSSID = "FRITZ!Box 7590 VL";
+// const char *wifiPAS = "56616967766283031728";
+const char *wifiSSID = "Pixel7";
+const char *wifiPAS = "11223GB0107";
 String wifiCon = "Connecting to WiFi";
+IPAddress localIP;
 
 /* Klassen */
 TaskHandle_t TaskWriteSinus; // Task
@@ -131,8 +134,12 @@ void wifiInit()
 
     indexWait++;
     indexDot++;
+    if(WiFi.status() == WL_CONNECTED){
+      Serial.println("Connected");
+      break;
+    }
 
-  } while (indexWait < 30);
+  } while (WiFi.status() != WL_CONNECTED || indexWait < 30);
 
   if (WiFi.status() == WL_CONNECTED)
   {
@@ -140,12 +147,18 @@ void wifiInit()
 
     myDisplay.drawString(64, 32, "WOW, you are connected!");
     myDisplay.display();
+    delay(1000);
+    localIP = WiFi.localIP();
+    myDisplay.clear();
+    myDisplay.drawString(64, 32, "Lokale IP-Adresse:\n" + String(localIP));
+    myDisplay.display();
+    //IP-Adresse anzeigen und UDP-Port des geräts
+    // Serial und display
   }
   else
   {
     myDisplay.clear();
-
-    myDisplay.drawString(64, 32, "OOO, you are not Connected!" + WiFi.status());
+    myDisplay.drawString(64, 32, "No connection :(\n WiFi Err-" + String(WiFi.status()));
     myDisplay.display();
   }
 }
