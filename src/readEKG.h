@@ -1,3 +1,6 @@
+#ifndef READEKG_H
+#define READEKG_H
+
 #include <Arduino.h>
 
 #define BUFFERSIZE 100
@@ -16,3 +19,5 @@ public:
     void getValue(uint16_t &pValue);
 
 };
+
+#endif
