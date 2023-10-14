@@ -18,8 +18,8 @@ Erstellt am 09.10.2023
 #include "display.h"
 
 #define EKG_SAMPLING_TIME 30 // Abtastzeit der EKG Messung
-#define DISPLAY_PERIOD 25    // Periode der Displayausgabe
-#define FREQUENCY 1           // Frequenz vom Sinus, aktuell 1Hz
+#define DISPLAY_PERIOD 50    // Periode der Displayausgabe
+#define FREQUENCY 1          // Frequenz vom Sinus, aktuell 1Hz
 
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
@@ -41,7 +41,6 @@ TaskHandle_t TaskWriteSinus; // Task
 readEKG myEKG;
 display myDisp(myDisplay, myEKG);
 
-
 /* Funktionen */
 void setup();
 void loop();
@@ -54,7 +53,6 @@ void setup()
   timerInit();
 
   Serial.begin(115200);
-  analogReadResolution(12);
   myDisplay.init();
   myDisplay.flipScreenVertically();
 
@@ -64,8 +62,9 @@ void setup()
 /* Hauptprogramm - Loop */
 void loop()
 {
-  if(flagDisplay){
-
+  if (flagDisplay)
+  {
+    myDisp.draw();
     flagDisplay = false;
   }
 }
@@ -84,19 +83,23 @@ void IRAM_ATTR onTimer()
   if (counterms % EKG_SAMPLING_TIME == 0)
   {
     myEKG.measure();
-    myDisp.draw();
-
   }
-  if(counterms % DISPLAY_PERIOD == 0){
+
+  /* delay by 5ms to prevent two tasks at the same time */
+  if (counterms % DISPLAY_PERIOD == 5)
+  {
     flagDisplay = true;
   }
-
 }
 
 void writeSinus(void *parameter)
 {
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 10 / portTICK_PERIOD_MS;
   for (;;)
   {
+
+    xTaskDelayUntil(&xLastWakeTime, xFrequency);
     /* Sinus, 1Hz */
     sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
     dacValue = int(sinusValue * 127.0 + 127.0);
