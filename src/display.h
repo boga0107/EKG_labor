@@ -22,9 +22,8 @@ private:
     SSD1306Wire &mDisplay;
     readEKG &mEKG;
     uint16_t mValue;
-    uint16_t mYpos;
-    uint16_t mYposOld;
     uint8_t mXpos;
+    uint8_t mYpos[2];
 };
 
 #endif

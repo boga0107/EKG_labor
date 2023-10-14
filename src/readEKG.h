@@ -17,6 +17,8 @@ public:
     readEKG();
     void measure();
     void getValue(uint16_t &pValue);
+    uint8_t getReadIndex();
+    uint8_t getWriteIndex();
 
 };
 

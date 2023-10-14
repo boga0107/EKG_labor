@@ -23,3 +23,12 @@ void readEKG::getValue(uint16_t &pValue)
     mReadIndex %= BUFFERSIZE;
 }
 
+uint8_t readEKG::getReadIndex()
+{
+    return mReadIndex;
+}
+
+uint8_t readEKG::getWriteIndex()
+{
+    return mWriteIndex;
+}
