@@ -32,7 +32,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     indexWait++;
     indexDot++;
 
-    if(WiFi.status() == WL_CONNECTED)
+    if (WiFi.status() == WL_CONNECTED)
     {
       break;
     }
@@ -53,7 +53,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     myWifiSettings.ESP_Port = myWifiSettings.Udp.remotePort();
 
     myDisplay.clear();
-    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.ESP_IP)+ "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
+    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.ESP_IP) + "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
     Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
     Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
     myDisplay.display();
@@ -61,8 +61,6 @@ void wifiInit(SSD1306Wire &myDisplay)
     delay(3000);
 
     myDisplay.clear();
-    
-
   }
   else
   {
@@ -73,6 +71,5 @@ void wifiInit(SSD1306Wire &myDisplay)
     delay(3000);
 
     myDisplay.clear();
-
   }
 }

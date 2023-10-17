@@ -19,14 +19,13 @@ Erstellt am 09.10.2023
 #include "defines.h"
 #include "wifiConfig.h"
 
-#define FREQUENCY 1          // Frequenz vom Sinus, aktuell 1Hz
+#define FREQUENCY 1 // Frequenz vom Sinus, aktuell 1Hz
 
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
 uint32_t counterms = 0;
 
 /* Variablen - Display*/
-uint8_t posX = 0;
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
 
 /* Sonstige Variablen */
@@ -58,6 +57,7 @@ void setup()
   myDisplay.flipScreenVertically();
 
   wifiInit(myDisplay);
+  xTaskCreate(writeSinus, "Write Sinus", 1000, NULL, 1, &TaskWriteSinus);
 }
 
 /* Hauptprogramm - Loop */
