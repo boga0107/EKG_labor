@@ -16,9 +16,8 @@ Erstellt am 09.10.2023
 #include "SSD1306Wire.h"
 #include "readEKG.h"
 #include "display.h"
+#include "defines.h"
 
-#define EKG_SAMPLING_TIME 30 // Abtastzeit der EKG Messung
-#define DISPLAY_PERIOD 50    // Periode der Displayausgabe
 #define FREQUENCY 1          // Frequenz vom Sinus, aktuell 1Hz
 
 /* Variablen - Timer */
@@ -80,13 +79,13 @@ void timerInit()
 void IRAM_ATTR onTimer()
 {
   counterms++;
-  if (counterms % EKG_SAMPLING_TIME == 0)
+  if (counterms % EKG_SAMPLING_TIME_MS == 0)
   {
     myEKG.measure();
   }
 
   /* delay by 5ms to prevent two tasks at the same time */
-  if (counterms % DISPLAY_PERIOD == 5)
+  if (counterms % DISPLAY_PERIOD_MS == 5)
   {
     flagDisplay = true;
   }
