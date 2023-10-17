@@ -16,9 +16,9 @@ struct wifiSettings
     /* const char *wifiSSID = "Vodafone-A1BC";
     const char *wifiPAS = "FNRaMbEtnTZGsn9C"; */
     String wifiCon = "Connecting to WiFi";
-    IPAddress localIP;
+    IPAddress ESP_IP;
     WiFiUDP Udp;
-    int remotePort = 0;
+    int ESP_Port = 0;
 } myWifiSettings;
 
 #endif
