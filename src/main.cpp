@@ -23,7 +23,7 @@ Erstellt am 09.10.2023
 
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
-uint32_t counterms = 0;
+uint32_t counter4ms = 0;
 
 /* Variablen - Display*/
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
@@ -52,6 +52,8 @@ void setup()
 
   wifiInit(myDisplay);
   xTaskCreate(writeSinus, "Write Sinus", 1000, NULL, 1, &TaskWriteSinus);
+
+  pinMode(TEST_OUT, OUTPUT);
 }
 
 /* Hauptprogramm - Loop */
@@ -68,20 +70,18 @@ void timerInit()
 {
   timer = timerBegin(0, 80, true);
   timerAttachInterrupt(timer, onTimer, true);
-  timerAlarmWrite(timer, 1000, true);
+  timerAlarmWrite(timer, 4000, true);
   timerAlarmEnable(timer);
 }
 
 void IRAM_ATTR onTimer()
 {
-  counterms++;
-  if (counterms % EKG_SAMPLING_TIME_MS == 0)
-  {
-    myEKG.measure();
-  }
+  myEKG.measure();
+  digitalWrite(TEST_OUT, LOW);
+  counter4ms++;
 
-  /* delay by 5ms to prevent two tasks at the same time */
-  if (counterms % DISPLAY_PERIOD_MS == 5)
+  /* delay by 2ms to prevent two tasks at the same time */
+  if (counter4ms % DISPLAY_PERIOD_MS == 2)
   {
     flagDisplay = true;
   }
@@ -100,10 +100,10 @@ void writeSinus(void *parameter)
 
     xTaskDelayUntil(&xLastWakeTime, xFrequency);
     /* Sinus, 1Hz */
-    // sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
-    // dacValue = int(sinusValue * 127.0 + 127.0);
+    sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
+    dacValue = int(sinusValue * 127.0 + 127.0);
     dacWrite(25, dacValue);
-    dacValue++;
-    dacValue %= 256;
+    // dacValue++;
+    // dacValue %= 256;
   }
 }

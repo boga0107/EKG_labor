@@ -2,6 +2,7 @@
 #define READEKG_H
 
 #include <Arduino.h>
+#include "defines.h"
 
 #define BUFFERSIZE 100
 #define PIN 33

@@ -11,6 +11,7 @@ readEKG::readEKG() : mWriteIndex(0), mReadIndex(0)
 
 void readEKG::measure()
 {
+    digitalWrite(TEST_OUT, HIGH);
     analogBuffer[mWriteIndex] = analogRead(PIN);
     mWriteIndex++;
     mWriteIndex %= BUFFERSIZE;
