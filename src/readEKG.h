@@ -1,3 +1,6 @@
+#ifndef READEKG_H
+#define READEKG_H
+
 #include <Arduino.h>
 
 #define BUFFERSIZE 100
@@ -14,5 +17,9 @@ public:
     readEKG();
     void measure();
     void getValue(uint16_t &pValue);
+    uint8_t getReadIndex();
+    uint8_t getWriteIndex();
 
 };
+
+#endif

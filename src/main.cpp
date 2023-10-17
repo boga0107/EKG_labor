@@ -15,34 +15,31 @@ Erstellt am 09.10.2023
 #include "Wire.h"
 #include "SSD1306Wire.h"
 #include "readEKG.h"
+#include "display.h"
+#include "defines.h"
 #include "wifiConfig.h"
 
-#define EKG_SAMPLING_TIME 100
+#define FREQUENCY 1 // Frequenz vom Sinus, aktuell 1Hz
 
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
 uint32_t counterms = 0;
 
 /* Variablen - Display*/
-uint8_t posX = 0;
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
-
-/* Sonstige Variablen */
-bool flagRead = false; // Scheduling - Timer-Interrupt
-float sinusValue = 0;
-uint8_t freque = 1; // Frequenz vom Sinus, aktuell 1Hz
-uint8_t dacValue = 0;
-uint16_t adcValue = 0;
+bool flagDisplay = false; // Scheduling des Displays
 
 /* Klassen */
 TaskHandle_t TaskWriteSinus; // Task
-// readEKG myEKG;
+readEKG myEKG;
+display myDisp(myDisplay, myEKG);
 
 /* Funktionen */
 void setup();
 void loop();
 void timerInit();
 void IRAM_ATTR onTimer();
+void writeSinus(void *parameter);
 
 void setup()
 {
@@ -50,32 +47,21 @@ void setup()
   timerInit();
 
   Serial.begin(115200);
-  analogReadResolution(12);
   myDisplay.init();
   myDisplay.flipScreenVertically();
 
   wifiInit(myDisplay);
+  xTaskCreate(writeSinus, "Write Sinus", 1000, NULL, 1, &TaskWriteSinus);
 }
 
 /* Hauptprogramm - Loop */
 void loop()
 {
-  /* Alle 20ms wird ein Pixel erstellt. */
-  if (flagRead)
+  if (flagDisplay)
   {
-    // myEKG.getValue(adcValue);
-    // adcValue = map(adcValue, 0, 4095, 55, 10);
-    // myDisplay.setPixel(posX, adcValue);
-    // myDisplay.display();
-    // posX++;
-    // flagRead = false;
+    myDisp.draw();
+    flagDisplay = false;
   }
-  /* Nach 2,5sek wird der Display zurück gesetzt */
-  // if (posX == 128)
-  // {
-  //   posX = 0;
-  //   myDisplay.clear();
-  // }
 }
 
 void timerInit()
@@ -89,12 +75,35 @@ void timerInit()
 void IRAM_ATTR onTimer()
 {
   counterms++;
-  if (counterms % 20 == 0)
+  if (counterms % EKG_SAMPLING_TIME_MS == 0)
   {
-    flagRead = true;
+    myEKG.measure();
   }
-  if (counterms % EKG_SAMPLING_TIME == 0)
+
+  /* delay by 5ms to prevent two tasks at the same time */
+  if (counterms % DISPLAY_PERIOD_MS == 5)
   {
-    // myEKG.measure();
+    flagDisplay = true;
+  }
+}
+
+void writeSinus(void *parameter)
+{
+  TickType_t xLastWakeTime;
+  const TickType_t xFrequency = 20 / portTICK_PERIOD_MS;
+
+  float sinusValue = 0;
+  uint8_t dacValue = 0;
+
+  for (;;)
+  {
+
+    xTaskDelayUntil(&xLastWakeTime, xFrequency);
+    /* Sinus, 1Hz */
+    // sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
+    // dacValue = int(sinusValue * 127.0 + 127.0);
+    dacWrite(25, dacValue);
+    dacValue++;
+    dacValue %= 256;
   }
 }
