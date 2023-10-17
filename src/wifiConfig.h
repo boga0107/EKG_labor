@@ -18,7 +18,9 @@ struct wifiSettings
     String wifiCon = "Connecting to WiFi";
     IPAddress ESP_IP;
     WiFiUDP Udp;
-    int ESP_Port = 0;
-} myWifiSettings;
+    int ESP_Port = 12345;
+};
+
+static wifiSettings myWifiSettings;
 
 #endif
