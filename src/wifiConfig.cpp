@@ -50,7 +50,13 @@ void wifiInit(SSD1306Wire &myDisplay)
     delay(1000);
 
     myWifiSettings.ESP_IP = WiFi.localIP();
-    myWifiSettings.ESP_Port = myWifiSettings.Udp.begin(myWifiSettings.ESP_IP, myWifiSettings.ESP_Port);
+    if(myWifiSettings.Udp.begin(myWifiSettings.ESP_IP, myWifiSettings.ESP_Port) == 1)
+    {
+    }
+    else
+    {
+        myWifiSettings.ESP_Port = 00000;
+    }
 
     myDisplay.clear();
     myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.ESP_IP)+ "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
