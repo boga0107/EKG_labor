@@ -27,7 +27,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     myWifiSettings.wifiCon += ".";
     myDisplay.display();
 
-    delay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     indexWait++;
     indexDot++;
@@ -47,7 +47,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     myDisplay.drawString(64, 32, "WOW, you are connected!");
     myDisplay.display();
 
-    delay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     myWifiSettings.ESP_IP = WiFi.localIP();
     myWifiSettings.ESP_Port = myWifiSettings.Udp.begin(myWifiSettings.ESP_IP, myWifiSettings.ESP_Port);
@@ -58,7 +58,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
     myDisplay.display();
 
-    delay(3000);
+    vTaskDelay(3000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     myDisplay.clear();
   }
@@ -68,7 +68,7 @@ void wifiInit(SSD1306Wire &myDisplay)
     myDisplay.drawString(64, 32, "No connection :(\n WiFi Err-" + String(WiFi.status()));
     myDisplay.display();
 
-    delay(3000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     myDisplay.clear();
   }
