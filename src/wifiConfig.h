@@ -9,7 +9,7 @@
 
 void wifiInit(SSD1306Wire &myDisplay);
 
-struct wifiSettings
+typedef struct
 {
     const char *wifiSSID = "FRITZ!Box 7590 VL";
     const char *wifiPAS = "56616967766283031728";
