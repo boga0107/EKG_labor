@@ -27,13 +27,7 @@ uint32_t counterms = 0;
 
 /* Variablen - Display*/
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
-
-/* Sonstige Variablen */
-bool flagDisplay = false; // Scheduling - Timer-Interrupt
-float sinusValue = 0;
-
-uint8_t dacValue = 0;
-uint16_t adcValue = 0;
+bool flagDisplay = false; // Scheduling des Displays
 
 /* Klassen */
 TaskHandle_t TaskWriteSinus; // Task
@@ -96,14 +90,20 @@ void IRAM_ATTR onTimer()
 void writeSinus(void *parameter)
 {
   TickType_t xLastWakeTime;
-  const TickType_t xFrequency = 10 / portTICK_PERIOD_MS;
+  const TickType_t xFrequency = 20 / portTICK_PERIOD_MS;
+
+  float sinusValue = 0;
+  uint8_t dacValue = 0;
+
   for (;;)
   {
 
     xTaskDelayUntil(&xLastWakeTime, xFrequency);
     /* Sinus, 1Hz */
-    sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
-    dacValue = int(sinusValue * 127.0 + 127.0);
+    // sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
+    // dacValue = int(sinusValue * 127.0 + 127.0);
     dacWrite(25, dacValue);
+    dacValue++;
+    dacValue %= 256;
   }
 }
