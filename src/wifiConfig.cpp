@@ -49,13 +49,13 @@ void wifiInit(SSD1306Wire &myDisplay)
 
     delay(1000);
 
-    myWifiSettings.localIP = WiFi.localIP();
-    myWifiSettings.remotePort = myWifiSettings.Udp.remotePort();
+    myWifiSettings.ESP_IP = WiFi.localIP();
+    myWifiSettings.ESP_Port = myWifiSettings.Udp.remotePort();
 
     myDisplay.clear();
-    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.localIP)+ "\nUDP-Port:\n" + myWifiSettings.remotePort);
-    Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.localIP));
-    Serial.print("UDP-Port: " + myWifiSettings.remotePort);
+    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.ESP_IP)+ "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
+    Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
+    Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
     myDisplay.display();
 
     delay(3000);
