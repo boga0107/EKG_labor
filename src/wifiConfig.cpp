@@ -50,16 +50,19 @@ void wifiInit(SSD1306Wire &myDisplay)
     vTaskDelay(1000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     myWifiSettings.ESP_IP = WiFi.localIP();
-    if(myWifiSettings.Udp.begin(myWifiSettings.ESP_IP, myWifiSettings.ESP_Port) == 1)
+    myWifiSettings.ESP_IP_String = WiFi.localIP().toString();
+    Serial.println(myWifiSettings.ESP_IP);
+
+    if (myWifiSettings.Udp.begin(myWifiSettings.ESP_IP, myWifiSettings.ESP_Port) == 1)
     {
     }
     else
     {
-        myWifiSettings.ESP_Port = 00000;
+      myWifiSettings.ESP_Port = 00000;
     }
 
     myDisplay.clear();
-    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + String(myWifiSettings.ESP_IP) + "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
+    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + myWifiSettings.ESP_IP_String + "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
     Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
     Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
     myDisplay.display();
@@ -77,5 +80,33 @@ void wifiInit(SSD1306Wire &myDisplay)
     vTaskDelay(1000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
 
     myDisplay.clear();
+  }
+}
+
+bool connectToMatLab(SSD1306Wire &myDisplay)
+{
+  uint8_t buffer[2];
+  if (myWifiSettings.Udp.available())
+  {
+    myWifiSettings.Udp.readBytes(buffer, 2);
+
+    uint16_t receivedValue;
+    uint8_t *pointer = (uint8_t *)&receivedValue;
+    for (uint8_t i = 0; i < sizeof(buffer); i++)
+    {
+      pointer[i] = buffer[i];
+    }
+    myDisplay.clear();
+    myDisplay.drawString(64, 32, String(receivedValue));
+    myDisplay.display();
+
+    return true;
+  }
+  else{
+    myDisplay.clear();
+    myDisplay.drawString(64, 32, "error!");
+    myDisplay.display();
+
+    return false;
   }
 }

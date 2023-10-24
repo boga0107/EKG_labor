@@ -1,0 +1,9 @@
+ESPipAdresse = "2461837504";
+udpPort = 12345;
+
+testVar = 777;
+
+% Initialisierung
+uBroadcaster = udpPort("ekgData");
+uBroadcaster.EnableBroadcast = true;
+write(uBroadcaster, testVar, "uint16", ipAdresse, )

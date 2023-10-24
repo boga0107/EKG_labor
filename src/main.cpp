@@ -25,7 +25,6 @@ Erstellt am 09.10.2023
 TaskHandle_t TaskWriteSinus; // Task
 TaskHandle_t TaskUDPTransmit;
 
-
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
 uint32_t counter4ms = 0;
@@ -54,6 +53,10 @@ void setup()
   myDisplay.init();
   myDisplay.flipScreenVertically();
   wifiInit(myDisplay);
+
+  while (!connectToMatLab(myDisplay))
+  {
+  }
 
   xTaskCreate(
       writeSinus,

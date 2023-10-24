@@ -8,6 +8,7 @@
 #include "ESPAsyncWebServer.h"
 
 void wifiInit(SSD1306Wire &myDisplay);
+bool connectToMatLab(SSD1306Wire &myDisplay);
 
 typedef struct
 {
@@ -19,10 +20,13 @@ typedef struct
     const char *wifiPAS = "11223GB0107";*/
     String wifiCon = "Connecting to WiFi";
     IPAddress ESP_IP;
+    String ESP_IP_String;
     WiFiUDP Udp;
-    int ESP_Port = 12345;
+    int ESP_Port = 123;
 } wifiSettings;
 
 static wifiSettings myWifiSettings;
+
+
 
 #endif
