@@ -54,9 +54,8 @@ void setup()
   myDisplay.flipScreenVertically();
   wifiInit(myDisplay);
 
-  while (!connectToMatLab(myDisplay))
-  {
-  }
+  while(!connectToMatLab(myDisplay)){}
+  vTaskDelay(3000 / portTICK_PERIOD_MS);
 
   xTaskCreate(
       writeSinus,

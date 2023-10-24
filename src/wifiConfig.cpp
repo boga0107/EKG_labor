@@ -86,6 +86,7 @@ void wifiInit(SSD1306Wire &myDisplay)
 bool connectToMatLab(SSD1306Wire &myDisplay)
 {
   uint8_t buffer[2];
+  myWifiSettings.Udp.parsePacket();
   if (myWifiSettings.Udp.available())
   {
     myWifiSettings.Udp.readBytes(buffer, 2);
@@ -100,13 +101,27 @@ bool connectToMatLab(SSD1306Wire &myDisplay)
     myDisplay.drawString(64, 32, String(receivedValue));
     myDisplay.display();
 
-    return true;
-  }
-  else{
+    delay(1000);
+    myWifiSettings.REMOTE_IP = myWifiSettings.Udp.remoteIP();
+    myWifiSettings.REMOTE_PORT = myWifiSettings.Udp.remotePort();
+
     myDisplay.clear();
-    myDisplay.drawString(64, 32, "error!");
+    myDisplay.drawString(64, 10, "Remote IP-Adresse:\n" + myWifiSettings.REMOTE_IP.toString() + "\nUDP-Port:\n" + myWifiSettings.REMOTE_PORT);
+    Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
+    Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
     myDisplay.display();
 
+    myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT);
+    uint16_t writeVal = 12345;
+    uint8_t *writePointer = (uint8_t *)&writeVal;
+    for (uint8_t i = 0; i < sizeof(writeVal); i++)
+    {
+      myWifiSettings.Udp.write(writePointer[i]);
+    }
+    return myWifiSettings.Udp.endPacket();
+  }
+  else
+  {
     return false;
   }
 }

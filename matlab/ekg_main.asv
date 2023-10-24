@@ -1,9 +1,13 @@
-ESPipAdresse = "2461837504";
-udpPort = 12345;
+ESPipAdresse = "192.168.177.89";
+ESPudpPort = 123;
 
 testVar = 777;
 
 % Initialisierung
-uBroadcaster = udpPort("ekgData");
+uBroadcaster = udpport("datagram")
 uBroadcaster.EnableBroadcast = true;
-write(uBroadcaster, testVar, "uint16", ipAdresse, )
+uReceiver = udpport("byte", "LocalPort",2020, "EnablePortSharing",true)
+
+write(uBroadcaster, testVar, "uint16", ESPipAdresse, ESPudpPort);
+
+
