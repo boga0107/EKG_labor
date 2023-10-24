@@ -21,6 +21,11 @@ Erstellt am 09.10.2023
 
 #define FREQUENCY 1 // Frequenz vom Sinus, aktuell 1Hz
 
+/* globale Variablen */
+TaskHandle_t TaskWriteSinus; // Task
+TaskHandle_t TaskUDPTransmit;
+
+
 /* Variablen - Timer */
 hw_timer_s *timer = NULL;
 uint32_t counter4ms = 0;
@@ -28,9 +33,9 @@ uint32_t counter4ms = 0;
 /* Variablen - Display*/
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
 bool flagDisplay = false; // Scheduling des Displays
+bool flagRead = false;
 
 /* Klassen */
-TaskHandle_t TaskWriteSinus; // Task
 readEKG myEKG;
 display myDisp(myDisplay, myEKG);
 
@@ -40,20 +45,35 @@ void loop();
 void timerInit();
 void IRAM_ATTR onTimer();
 void writeSinus(void *parameter);
+void transmitUDP(void *parameter);
 
 void setup()
 {
 
-  timerInit();
-
   Serial.begin(115200);
   myDisplay.init();
   myDisplay.flipScreenVertically();
-
   wifiInit(myDisplay);
-  xTaskCreate(writeSinus, "Write Sinus", 1000, NULL, 1, &TaskWriteSinus);
+
+  xTaskCreate(
+      writeSinus,
+      "Write Sinus",
+      1000,
+      NULL,
+      1,
+      &TaskWriteSinus);
+
+  xTaskCreate(
+      transmitUDP,
+      "Transmit UDP",
+      2000,
+      NULL,
+      0,
+      &TaskUDPTransmit);
 
   pinMode(TEST_OUT, OUTPUT);
+  myDisplay.clear();
+  timerInit();
 }
 
 /* Hauptprogramm - Loop */
@@ -77,7 +97,6 @@ void timerInit()
 void IRAM_ATTR onTimer()
 {
   myEKG.measure();
-  digitalWrite(TEST_OUT, LOW);
   counter4ms++;
 
   /* delay by 2ms to prevent two tasks at the same time */
@@ -100,10 +119,33 @@ void writeSinus(void *parameter)
 
     xTaskDelayUntil(&xLastWakeTime, xFrequency);
     /* Sinus, 1Hz */
-    sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
-    dacValue = int(sinusValue * 127.0 + 127.0);
+    // sinusValue = sin(2.0 * PI * FREQUENCY * millis() / 1000.0);
+    // dacValue = int(sinusValue * 127.0 + 127.0);
     dacWrite(25, dacValue);
-    // dacValue++;
+    dacValue++;
     // dacValue %= 256;
+  }
+}
+
+void transmitUDP(void *parameter)
+{
+  bool flagUDPSend = true; // Scheduling des Verschickens per UDP
+
+  for (;;)
+  {
+
+    if (myEKG.getWriteIndex() >= BUFFERSIZE / 2 && flagUDPSend)
+    {
+
+      Serial.printf("Send first!\t- %d\n", counter4ms * 4);
+      flagUDPSend = false;
+    }
+    /* UDP send second half of buffer */
+    if (myEKG.getWriteIndex() < BUFFERSIZE / 2 && !flagUDPSend)
+    {
+
+      Serial.printf("Send second!\t- %d\n", counter4ms * 4);
+      flagUDPSend = true;
+    }
   }
 }

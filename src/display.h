@@ -25,6 +25,9 @@ private:
     uint8_t mXpos;
     float mXposFloat;
     uint8_t mYpos[2];
+    uint16_t localWriteIndex;
 };
+
+
 
 #endif

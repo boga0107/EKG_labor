@@ -4,23 +4,23 @@
 #include <Arduino.h>
 #include "defines.h"
 
-#define BUFFERSIZE 100
 #define PIN 33
-
 
 class readEKG
 {
 private:
+    uint16_t readValue;
     uint16_t analogBuffer[BUFFERSIZE];
-    uint8_t mWriteIndex;
-    uint8_t mReadIndex;
+    uint16_t mWriteIndex;
+    uint16_t mReadIndex;
+
 public:
     readEKG();
     void measure();
+    void writeValue();
     void getValue(uint16_t &pValue);
-    uint8_t getReadIndex();
-    uint8_t getWriteIndex();
-
+    uint16_t getReadIndex();
+    uint16_t getWriteIndex();
 };
 
 #endif

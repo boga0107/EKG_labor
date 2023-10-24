@@ -1,6 +1,5 @@
 #include "display.h"
 
-
 display::display(SSD1306Wire &pDisplay, readEKG &pEKG) : mDisplay(pDisplay), mEKG(pEKG), mValue(0), mXpos(0), mXposFloat(0.0)
 {
 }
@@ -8,10 +7,12 @@ display::display(SSD1306Wire &pDisplay, readEKG &pEKG) : mDisplay(pDisplay), mEK
 void display::draw()
 {
     /* drawing the graph, while readIndex didn't catch up to writeIndex */
-    while (mEKG.getReadIndex() != mEKG.getWriteIndex())
+    localWriteIndex = mEKG.getWriteIndex();
+
+    while (mEKG.getReadIndex() != localWriteIndex)
     {
-      
-        mEKG.getValue(mValue);  /* returns last not read value */
+
+        mEKG.getValue(mValue);                  /* returns last not read value */
         mYpos[1] = map(mValue, 0, 4095, 58, 4); /* value gets remapped to the size of the display */
 
         /* draw the graph an connect last two values with a line */
@@ -25,15 +26,14 @@ void display::draw()
         }
 
         mYpos[0] = mYpos[1]; /* current value is the past value for the next iteration */
-        mXposFloat = mXposFloat + float(MAX_X_VALUE)*float(EKG_SAMPLING_TIME_MS)/float(GRAPH_TIME_MS);
+        mXposFloat = mXposFloat + float(MAX_X_VALUE) * float(EKG_SAMPLING_TIME_MS) / float(GRAPH_TIME_MS);
         mXpos = int(mXposFloat);
-        
     }
-    
+
     mDisplay.display(); /* display last drawings */
 
     /* reached right edge of the display */
-    if(mXpos >= MAX_X_VALUE)
+    if (mXpos >= MAX_X_VALUE)
     {
         mXpos = 0;
         mXposFloat = 0.0;

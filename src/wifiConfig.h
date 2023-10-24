@@ -11,12 +11,12 @@ void wifiInit(SSD1306Wire &myDisplay);
 
 typedef struct
 {
-    /* const char *wifiSSID = "FRITZ!Box 7590 VL";
-    const char *wifiPAS = "56616967766283031728"; */
+    const char *wifiSSID = "FRITZ!Box 7590 VL";
+    const char *wifiPAS = "56616967766283031728";
     /* const char *wifiSSID = "Vodafone-A1BC";
     const char *wifiPAS = "FNRaMbEtnTZGsn9C"; */
-    const char *wifiSSID = "Pixel7";
-    const char *wifiPAS = "11223GB0107";
+    /*const char *wifiSSID = "Pixel7";
+    const char *wifiPAS = "11223GB0107";*/
     String wifiCon = "Connecting to WiFi";
     IPAddress ESP_IP;
     WiFiUDP Udp;
