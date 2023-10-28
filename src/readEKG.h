@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "defines.h"
+#include "wifiConfig.h"
 
 #define PIN 33
 
@@ -21,6 +22,8 @@ public:
     void getValue(uint16_t &pValue);
     uint16_t getReadIndex();
     uint16_t getWriteIndex();
+    void transmitFirst();
+    void transmitSecond();
 };
 
 #endif

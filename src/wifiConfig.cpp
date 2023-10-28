@@ -3,6 +3,7 @@
 
 void wifiInit(SSD1306Wire &myDisplay)
 {
+
   myDisplay.setTextAlignment(TEXT_ALIGN_CENTER);
 
   uint8_t indexWait = 0;
@@ -62,9 +63,9 @@ void wifiInit(SSD1306Wire &myDisplay)
     }
 
     myDisplay.clear();
-    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + myWifiSettings.ESP_IP_String + "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
-    Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
-    Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
+    myDisplay.drawString(64, 10, "Lokale IP-Adresse:\n" + myWifiSettings.ESP_IP.toString() + "\nUDP-Port:\n" + myWifiSettings.ESP_Port);
+    Serial.println("Lokale IP-Adresse: " + myWifiSettings.ESP_IP.toString());
+    Serial.println("UDP-Port: " + String(myWifiSettings.ESP_Port));
     myDisplay.display();
 
     vTaskDelay(3000 / portTICK_PERIOD_MS); /* Delay von 1000ms */
@@ -101,27 +102,41 @@ bool connectToMatLab(SSD1306Wire &myDisplay)
     myDisplay.drawString(64, 32, String(receivedValue));
     myDisplay.display();
 
-    delay(1000);
     myWifiSettings.REMOTE_IP = myWifiSettings.Udp.remoteIP();
-    myWifiSettings.REMOTE_PORT = myWifiSettings.Udp.remotePort();
+    myWifiSettings.REMOTE_PORT = 2020;
 
     myDisplay.clear();
     myDisplay.drawString(64, 10, "Remote IP-Adresse:\n" + myWifiSettings.REMOTE_IP.toString() + "\nUDP-Port:\n" + myWifiSettings.REMOTE_PORT);
-    Serial.print("Lokale IP-Adresse: " + String(myWifiSettings.ESP_IP));
-    Serial.print("UDP-Port: " + myWifiSettings.ESP_Port);
+    Serial.println("Remote IP-Adresse: " + myWifiSettings.REMOTE_IP.toString());
+    Serial.println("Remote UDP-Port: " + String(myWifiSettings.REMOTE_PORT));
     myDisplay.display();
 
-    myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT);
+    /*myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT);
     uint16_t writeVal = 12345;
     uint8_t *writePointer = (uint8_t *)&writeVal;
-    for (uint8_t i = 0; i < sizeof(writeVal); i++)
-    {
-      myWifiSettings.Udp.write(writePointer[i]);
-    }
-    return myWifiSettings.Udp.endPacket();
+    myWifiSettings.Udp.write(writePointer, sizeof(writeVal));
+
+    return myWifiSettings.Udp.endPacket();*/
+
+    return true;
   }
   else
   {
     return false;
   }
+}
+
+void openTransmit()
+{
+  myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT);
+}
+
+void closeTransmit()
+{
+  myWifiSettings.Udp.endPacket();
+}
+
+void sendData(uint8_t &pData)
+{
+  myWifiSettings.Udp.write(pData);
 }

@@ -38,3 +38,25 @@ uint16_t readEKG::getWriteIndex()
 {
     return mWriteIndex;
 }
+
+void readEKG::transmitFirst()
+{
+    openTransmit();
+    uint8_t *writePointer = (uint8_t *)analogBuffer;
+    for (uint16_t i = 0; i < BUFFERSIZE / 2; i++)
+    {
+        sendData(writePointer[i]);
+    }
+    closeTransmit();
+}
+
+void readEKG::transmitSecond()
+{
+    openTransmit();
+    uint8_t *writePointer = (uint8_t *)analogBuffer;
+    for (uint16_t i = BUFFERSIZE / 2; i < BUFFERSIZE; i++)
+    {
+        sendData(writePointer[i]);
+    }
+    closeTransmit();
+}

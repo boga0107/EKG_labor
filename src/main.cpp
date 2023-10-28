@@ -33,6 +33,7 @@ uint32_t counter4ms = 0;
 SSD1306Wire myDisplay(0x3c, SDA, SCL);
 bool flagDisplay = false; // Scheduling des Displays
 bool flagRead = false;
+bool flagUDPSend = true; // Scheduling des Verschickens per UDP
 
 /* Klassen */
 readEKG myEKG;
@@ -44,7 +45,7 @@ void loop();
 void timerInit();
 void IRAM_ATTR onTimer();
 void writeSinus(void *parameter);
-void transmitUDP(void *parameter);
+
 
 void setup()
 {
@@ -54,24 +55,21 @@ void setup()
   myDisplay.flipScreenVertically();
   wifiInit(myDisplay);
 
-  while(!connectToMatLab(myDisplay)){}
+  while (!connectToMatLab(myDisplay))
+  {
+  }
+
   vTaskDelay(3000 / portTICK_PERIOD_MS);
 
-  xTaskCreate(
+  xTaskCreatePinnedToCore(
       writeSinus,
       "Write Sinus",
       1000,
       NULL,
       1,
-      &TaskWriteSinus);
+      &TaskWriteSinus,
+      xPortGetCoreID());
 
-  xTaskCreate(
-      transmitUDP,
-      "Transmit UDP",
-      2000,
-      NULL,
-      0,
-      &TaskUDPTransmit);
 
   pinMode(TEST_OUT, OUTPUT);
   myDisplay.clear();
@@ -85,6 +83,21 @@ void loop()
   {
     myDisp.draw();
     flagDisplay = false;
+  }
+
+  if (myEKG.getWriteIndex() >= BUFFERSIZE / 2 && flagUDPSend)
+  {
+    Serial.printf("Send first!\t- %d\n", counter4ms * 4);
+    myEKG.transmitFirst();
+    flagUDPSend = false;
+  }
+
+  /* UDP send second half of buffer */
+  if (myEKG.getWriteIndex() < BUFFERSIZE / 2 && !flagUDPSend)
+  {
+    Serial.printf("Send second!\t- %d\n", counter4ms * 4);
+    myEKG.transmitSecond();
+    flagUDPSend = true;
   }
 }
 
@@ -129,25 +142,3 @@ void writeSinus(void *parameter)
   }
 }
 
-void transmitUDP(void *parameter)
-{
-  bool flagUDPSend = true; // Scheduling des Verschickens per UDP
-
-  for (;;)
-  {
-
-    if (myEKG.getWriteIndex() >= BUFFERSIZE / 2 && flagUDPSend)
-    {
-
-      Serial.printf("Send first!\t- %d\n", counter4ms * 4);
-      flagUDPSend = false;
-    }
-    /* UDP send second half of buffer */
-    if (myEKG.getWriteIndex() < BUFFERSIZE / 2 && !flagUDPSend)
-    {
-
-      Serial.printf("Send second!\t- %d\n", counter4ms * 4);
-      flagUDPSend = true;
-    }
-  }
-}
