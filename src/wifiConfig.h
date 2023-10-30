@@ -19,8 +19,10 @@ typedef struct
     const char *wifiPAS = "56616967766283031728"; */
     /* const char *wifiSSID = "Vodafone-A1BC";
     const char *wifiPAS = "FNRaMbEtnTZGsn9C"; */
-    const char *wifiSSID = "Pixel7";
-    const char *wifiPAS = "11223GB0107";
+    /*const char *wifiSSID = "Pixel7";
+    const char *wifiPAS = "11223GB0107";*/
+    const char *wifiSSID = "WLAN-7EZLYG";
+    const char *wifiPAS = "0169360086146884";
     String wifiCon = "Connecting to WiFi";
     IPAddress ESP_IP;
     String ESP_IP_String;

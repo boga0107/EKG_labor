@@ -84,7 +84,7 @@ void loop()
     myDisp.draw();
     flagDisplay = false;
   }
-
+   /* UDP send first half of buffer */
   if (myEKG.getWriteIndex() >= BUFFERSIZE / 2 && flagUDPSend)
   {
     Serial.printf("Send first!\t- %d\n", counter4ms * 4);

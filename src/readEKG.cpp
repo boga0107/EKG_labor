@@ -43,7 +43,7 @@ void readEKG::transmitFirst()
 {
     openTransmit();
     uint8_t *writePointer = (uint8_t *)analogBuffer;
-    for (uint16_t i = 0; i < BUFFERSIZE / 2; i++)
+    for (uint16_t i = 0; i < BUFFERSIZE / 2 * 2; i++)
     {
         sendData(writePointer[i]);
     }
@@ -54,7 +54,7 @@ void readEKG::transmitSecond()
 {
     openTransmit();
     uint8_t *writePointer = (uint8_t *)analogBuffer;
-    for (uint16_t i = BUFFERSIZE / 2; i < BUFFERSIZE; i++)
+    for (uint16_t i = BUFFERSIZE / 2 * 2 ; i < BUFFERSIZE * 2; i++)
     {
         sendData(writePointer[i]);
     }
