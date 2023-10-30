@@ -15,14 +15,23 @@ void sendData(uint8_t &pData);
 
 typedef struct
 {
-    /* const char *wifiSSID = "FRITZ!Box 7590 VL";
-    const char *wifiPAS = "56616967766283031728"; */
-    /* const char *wifiSSID = "Vodafone-A1BC";
-    const char *wifiPAS = "FNRaMbEtnTZGsn9C"; */
-    /*const char *wifiSSID = "Pixel7";
-    const char *wifiPAS = "11223GB0107";*/
+#define GABRIEL_PHONE
+#ifdef LABOR
+    const char *wifiSSID = "FRITZ!Box 7590 VL";
+    const char *wifiPAS = "56616967766283031728";
+#endif
+#ifdef WALTER_HOME
+    const char *wifiSSID = "Vodafone-A1BC";
+    const char *wifiPAS = "FNRaMbEtnTZGsn9C";
+#endif
+#ifdef GABRIEL_PHONE
+    const char *wifiSSID = "Pixel7";
+    const char *wifiPAS = "11223GB0107";
+#endif
+#ifdef GABRIEL_HOME
     const char *wifiSSID = "WLAN-7EZLYG";
     const char *wifiPAS = "0169360086146884";
+#endif
     String wifiCon = "Connecting to WiFi";
     IPAddress ESP_IP;
     String ESP_IP_String;
@@ -33,7 +42,5 @@ typedef struct
 } wifiSettings;
 
 static wifiSettings myWifiSettings;
-
-
 
 #endif

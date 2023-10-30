@@ -7,6 +7,9 @@
 
 #define PIN 33
 
+/* class to manage the EKG measuring and the 
+ * data processing and  distribution
+ * */
 class readEKG
 {
 private:
@@ -18,7 +21,6 @@ private:
 public:
     readEKG();
     void measure();
-    void writeValue();
     void getValue(uint16_t &pValue);
     uint16_t getReadIndex();
     uint16_t getWriteIndex();

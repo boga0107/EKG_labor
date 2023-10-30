@@ -20,6 +20,7 @@ Erstellt am 09.10.2023
 #include "wifiConfig.h"
 
 #define FREQUENCY 1 // Frequenz vom Sinus, aktuell 1Hz
+#define SIMULATION
 
 /* globale Variablen */
 TaskHandle_t TaskWriteSinus; // Task
@@ -46,7 +47,6 @@ void timerInit();
 void IRAM_ATTR onTimer();
 void writeSinus(void *parameter);
 
-
 void setup()
 {
 
@@ -58,9 +58,10 @@ void setup()
   while (!connectToMatLab(myDisplay))
   {
   }
+  vTaskDelay(3000 / portTICK_PERIOD_MS); /* pause to display informations */
 
-  vTaskDelay(3000 / portTICK_PERIOD_MS);
-
+#ifdef SIMULATION
+  // Task zum Simulieren eines Eingangsignals
   xTaskCreatePinnedToCore(
       writeSinus,
       "Write Sinus",
@@ -69,7 +70,7 @@ void setup()
       1,
       &TaskWriteSinus,
       xPortGetCoreID());
-
+#endif
 
   pinMode(TEST_OUT, OUTPUT);
   myDisplay.clear();
@@ -79,12 +80,15 @@ void setup()
 /* Hauptprogramm - Loop */
 void loop()
 {
+  /* refresh display */
   if (flagDisplay)
   {
     myDisp.draw();
     flagDisplay = false;
   }
-   /* UDP send first half of buffer */
+
+  /* Transmit Data */
+  /* UDP send first half of buffer */
   if (myEKG.getWriteIndex() >= BUFFERSIZE / 2 && flagUDPSend)
   {
     Serial.printf("Send first!\t- %d\n", counter4ms * 4);
@@ -101,6 +105,8 @@ void loop()
   }
 }
 
+/*** Funktionsimplementierungen ***/
+/* timer Konfiguration */
 void timerInit()
 {
   timer = timerBegin(0, 80, true);
@@ -109,6 +115,8 @@ void timerInit()
   timerAlarmEnable(timer);
 }
 
+/* Timer Interrupt */
+/* Aufruf im 4ms-Takt */
 void IRAM_ATTR onTimer()
 {
   myEKG.measure();
@@ -121,6 +129,8 @@ void IRAM_ATTR onTimer()
   }
 }
 
+#ifdef SIMULATION
+/* Signalsimulation */
 void writeSinus(void *parameter)
 {
   TickType_t xLastWakeTime;
@@ -141,4 +151,4 @@ void writeSinus(void *parameter)
     // dacValue %= 256;
   }
 }
-
+#endif

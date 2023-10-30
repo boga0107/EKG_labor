@@ -11,11 +11,15 @@
 #define MAX_Y_VALUE 64
 
 
-
+/* 
+ * Klasse zur Ansteuerung des Displays
+ * Die Information zum Beschreiben des Displays werden
+ * von der EKG-Klasse bereitgestellt
+ */
 class display
 {
 public:
-    display(SSD1306Wire &pDisplay, readEKG &pEKG);
+    display(SSD1306Wire &pDisplay, readEKG &pEKG); /* Konstruktor */
     void draw();
 
 private:

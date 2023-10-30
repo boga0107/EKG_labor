@@ -10,6 +10,9 @@ readEKG::readEKG() : mWriteIndex(0), mReadIndex(0)
     analogReadResolution(12);
 }
 
+/* measure method
+ * read the current value and add it to the buffer
+ */
 void readEKG::measure()
 {
     analogBuffer[mWriteIndex] = analogRead(PIN);
@@ -18,10 +21,7 @@ void readEKG::measure()
     mWriteIndex %= BUFFERSIZE;
 }
 
-void readEKG::writeValue()
-{
-}
-
+/* getter for the value at the current read index */
 void readEKG::getValue(uint16_t &pValue)
 {
     pValue = analogBuffer[mReadIndex];
@@ -29,16 +29,19 @@ void readEKG::getValue(uint16_t &pValue)
     mReadIndex %= BUFFERSIZE;
 }
 
+/* readIndex getter*/
 uint16_t readEKG::getReadIndex()
 {
     return mReadIndex;
 }
 
+/* writeIndex getter*/
 uint16_t readEKG::getWriteIndex()
 {
     return mWriteIndex;
 }
 
+/* prepare data of the first half of the buffer for transmit */
 void readEKG::transmitFirst()
 {
     openTransmit();
@@ -50,6 +53,7 @@ void readEKG::transmitFirst()
     closeTransmit();
 }
 
+/* prepare data of the second half of the buffer for transmit */
 void readEKG::transmitSecond()
 {
     openTransmit();
