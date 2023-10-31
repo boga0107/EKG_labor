@@ -20,7 +20,7 @@ Erstellt am 09.10.2023
 #include "wifiConfig.h"
 
 #define FREQUENCY 1 // Frequenz vom Sinus, aktuell 1Hz
-#define SIMULATION
+#define NO_SIMULATION
 
 /* globale Variablen */
 TaskHandle_t TaskWriteSinus; // Task

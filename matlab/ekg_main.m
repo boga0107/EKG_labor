@@ -4,7 +4,7 @@ clear
 
 T_A = 4e-3;
 f_A = 1/T_A;
-ESPipAdresse = "192.168.2.124";
+ESPipAdresse = "192.168.188.146";
 ESPudpPort = 123;
 BUFFERSIZE = 7500;
 data_sum = 0;

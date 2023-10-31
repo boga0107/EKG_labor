@@ -13,7 +13,7 @@ void display::draw()
     while (mEKG.getReadIndex() != localWriteIndex)
     {
         mEKG.getValue(mValue);                  /* returns last not read value */
-        mYpos[1] = map(mValue, 0, 4095, 58, 4); /* value gets remapped to the size of the display */
+        mYpos[1] = map(mValue, 0, 4095, 4, 58); /* value gets remapped to the size of the display */
 
         /* draw the graph an connect last two values with a line */
         if (mXpos == 0)

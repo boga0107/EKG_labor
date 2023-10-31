@@ -8,6 +8,8 @@ readEKG::readEKG() : mWriteIndex(0), mReadIndex(0)
         analogBuffer[i] = 0;
     }*/
     analogReadResolution(12);
+    pinMode(EN_EKG, OUTPUT);
+    digitalWrite(EN_EKG, HIGH);
 }
 
 /* measure method
