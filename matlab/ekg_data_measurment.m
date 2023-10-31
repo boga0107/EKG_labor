@@ -11,8 +11,6 @@ data_sum = 0;
 t = linspace(0,30,BUFFERSIZE);
 
 
-
-
 testVar = 777;
 
 % Initialisierung

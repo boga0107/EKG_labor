@@ -1,0 +1,10 @@
+clear
+close all
+
+T_A = 4;
+f_A = 1/T_A;
+T_MAX = 30000;
+
+data = load("gabriel_ekg.mat").data;
+t = linspace(0, T_MAX, T_MAX/T_);
+
