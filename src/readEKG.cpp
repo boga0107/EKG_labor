@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "readEKG.h"
 
-readEKG::readEKG() : mWriteIndex(0), mReadIndex(0)
+readEKG::readEKG() : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0)
 {
     /*for (uint8_t i = 0; i < BUFFERSIZE; i++)
     {
@@ -23,10 +23,28 @@ void readEKG::measure()
     mWriteIndex %= BUFFERSIZE;
 }
 
+void readEKG::filter()
+{
+    double y = 0.0;
+
+    mem0 = analogBuffer[mFilterIndex] - D1 * mem1 - D2 * mem2;
+    y = gain * (N0 * mem0 + N1 * mem1 + N2 * mem2);
+
+    mem2 = mem1;
+    mem1 = mem0;
+
+    if(y<0){
+        y = 0.0;
+    }
+    filteredBuffer[mFilterIndex] = uint16_t(y);
+    mFilterIndex++;
+    mFilterIndex %= BUFFERSIZE;
+}
+
 /* getter for the value at the current read index */
 void readEKG::getValue(uint16_t &pValue)
 {
-    pValue = analogBuffer[mReadIndex];
+    pValue = filteredBuffer[mReadIndex];
     mReadIndex++;
     mReadIndex %= BUFFERSIZE;
 }
@@ -35,6 +53,11 @@ void readEKG::getValue(uint16_t &pValue)
 uint16_t readEKG::getReadIndex()
 {
     return mReadIndex;
+}
+
+uint16_t readEKG::getFilterIndex()
+{
+    return mFilterIndex;
 }
 
 /* writeIndex getter*/
@@ -55,12 +78,34 @@ void readEKG::transmitFirst()
     closeTransmit();
 }
 
+void readEKG::transmitFirstFiltered()
+{
+    openTransmitFiltered();
+    uint8_t *writePointer = (uint8_t *)filteredBuffer;
+    for (uint16_t i = 0; i < BUFFERSIZE / 2 * 2; i++)
+    {
+        sendData(writePointer[i]);
+    }
+    closeTransmit();
+}
+
 /* prepare data of the second half of the buffer for transmit */
 void readEKG::transmitSecond()
 {
     openTransmit();
     uint8_t *writePointer = (uint8_t *)analogBuffer;
-    for (uint16_t i = BUFFERSIZE / 2 * 2 ; i < BUFFERSIZE * 2; i++)
+    for (uint16_t i = BUFFERSIZE / 2 * 2; i < BUFFERSIZE * 2; i++)
+    {
+        sendData(writePointer[i]);
+    }
+    closeTransmit();
+}
+
+void readEKG::transmitSecondFiltered()
+{
+    openTransmitFiltered();
+    uint8_t *writePointer = (uint8_t *)filteredBuffer;
+    for (uint16_t i = BUFFERSIZE / 2 * 2; i < BUFFERSIZE * 2; i++)
     {
         sendData(writePointer[i]);
     }

@@ -10,12 +10,13 @@
 void wifiInit(SSD1306Wire &myDisplay);
 bool connectToMatLab(SSD1306Wire &myDisplay);
 void openTransmit();
+void openTransmitFiltered();
 void closeTransmit();
 void sendData(uint8_t &pData);
 
 typedef struct
 {
-#define LABOR
+#define GABRIEL_PHONE
 #ifdef LABOR
     const char *wifiSSID = "FRITZ!Box 7590 VL";
     const char *wifiPAS = "56616967766283031728";
@@ -38,7 +39,8 @@ typedef struct
     WiFiUDP Udp;
     int ESP_Port = 123;
     IPAddress REMOTE_IP;
-    uint16_t REMOTE_PORT;
+    uint16_t REMOTE_PORT = 2020;
+    uint16_t REMOTE_PORT_FILTERED = 202;
 } wifiSettings;
 
 static wifiSettings myWifiSettings;

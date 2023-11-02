@@ -4,12 +4,13 @@ clear
 
 T_A = 4e-3;
 f_A = 1/T_A;
-ESPipAdresse = "192.168.188.146";
+ESPipAdresse = "192.168.177.89";
 ESPudpPort = 123;
 BUFFERSIZE = 7500;
 data_sum = 0;
 t = linspace(0,30,BUFFERSIZE);
-
+UnFilteredPort = 2020;
+FilteredPort = 0202;
 
 testVar = 777;
 
@@ -17,43 +18,90 @@ testVar = 777;
 uBroadcaster = udpport("datagram")
 uBroadcaster.EnableBroadcast = true;
 
-uReceiver = udpport("byte", "LocalPort",2020, "EnablePortSharing",true)
+uReceiver1 = udpport("byte", "LocalPort",UnFilteredPort, "EnablePortSharing",true)
+uReceiver2 = udpport("byte", "LocalPort",FilteredPort, "EnablePortSharing",true)
+
 
 write(uBroadcaster, testVar, "uint16", ESPipAdresse, ESPudpPort);
 pause(5)
 data = 0;
+dataFiltered = 0;
 n=1;
-Mem = 0;
+m =1;
 
- while n <= 7500
-     uReceiverCount = uReceiver.NumBytesAvailable;
-     if  uReceiverCount > 1 
-        data(n,:) = read(uReceiver, 1, "uint16");
-        data_sum = data_sum + data(n);
-    
-        n = n+1;  
+unfiltered = false;
+filtered = false;
+
+while true
+     uReceiver1Count = uReceiver1.NumBytesAvailable;
+     uReceiver2Count = uReceiver2.NumBytesAvailable;
+     if  uReceiver1Count > 1
+        data(n,:) = read(uReceiver1, 1, "uint16");
+        %data_sum = data_sum + data(n);
+        n = n+1
+        if n == 7501
+            unfiltered = true;
+        end
      end
- end
+     if uReceiver2Count > 1
+         dataFiltered(m,:) = read(uReceiver2, 1, "uint16");
+         %data_sum = data_sum + data(m);
+         m = m+1
+         if m == 7501
+             filtered = true;
+         end
+     end
+     if filtered && unfiltered
+         break
+     end
+end
 
 
 
 F_data = abs(fft(data));
 F_data = F_data/length(F_data);
 
+F_dataFiltered = abs(fft(dataFiltered));
+F_dataFiltered = F_dataFiltered/length(F_dataFiltered);
+
 %Frequenzachse
 x_f = linspace(0, f_A, length(F_data)+1);
 x_f = x_f(1:end-1);
 
 
-
+subplot(2,1,1)
 plot(t, data)
+hold
+plot(t, dataFiltered)
+grid
+xlim([0 5])
+xlabel("t[s]")
+title("Signal")
+legend("Eingangssignal", "Ausgangssignal")
 
+
+subplot(2,1,2)
+plot(x_f, F_data)
+hold
+plot(x_f, F_dataFiltered)
+ylim([0 100])
+xlabel("t[s]")
+title("Signal")
+legend("Eingangsspektrum", "Ausgangsspektrum")
 
 figure
+subplot(3,1,1)
+plot(t, data)
+grid
 
-plot(x_f, F_data)
+subplot(3,1,2)
+plot(t, dataFiltered)
+grid
 
+subplot(3,1,3)
+plot(t, data - dataFiltered)
+grid
 
+dataOut = [data dataFiltered data-dataFiltered];
 
-
-
+save("uC_data.mat", "dataOut")

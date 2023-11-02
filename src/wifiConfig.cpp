@@ -103,7 +103,6 @@ bool connectToMatLab(SSD1306Wire &myDisplay)
     myDisplay.display();
 
     myWifiSettings.REMOTE_IP = myWifiSettings.Udp.remoteIP();
-    myWifiSettings.REMOTE_PORT = 2020;
 
     myDisplay.clear();
     myDisplay.drawString(64, 10, "Remote IP-Adresse:\n" + myWifiSettings.REMOTE_IP.toString() + "\nUDP-Port:\n" + myWifiSettings.REMOTE_PORT);
@@ -129,6 +128,11 @@ bool connectToMatLab(SSD1306Wire &myDisplay)
 void openTransmit()
 {
   myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT);
+}
+
+void openTransmitFiltered()
+{
+  myWifiSettings.Udp.beginPacket(myWifiSettings.REMOTE_IP, myWifiSettings.REMOTE_PORT_FILTERED);
 }
 
 void closeTransmit()

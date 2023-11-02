@@ -8,11 +8,15 @@ display::display(SSD1306Wire &pDisplay, readEKG &pEKG) : mDisplay(pDisplay), mEK
 void display::draw()
 {
     /* drawing the graph, while readIndex didn't catch up to writeIndex */
-    localWriteIndex = mEKG.getWriteIndex();
+    localWriteIndex = mEKG.getFilterIndex();
 
     while (mEKG.getReadIndex() != localWriteIndex)
     {
-        mEKG.getValue(mValue);                  /* returns last not read value */
+        mEKG.getValue(mValue);
+        /* if(mValue > 4095){
+            Serial.printf("Overflow %d\n", mValue);
+            mValue = 4095;
+        }    */              /* returns last not read value */
         mYpos[1] = map(mValue, 0, 4095, 4, 58); /* value gets remapped to the size of the display */
 
         /* draw the graph an connect last two values with a line */
