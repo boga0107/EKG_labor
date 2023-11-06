@@ -1,8 +1,12 @@
 #include <Arduino.h>
 #include "readEKG.h"
 
-readEKG::readEKG() : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0)
+readEKG::readEKG() : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0), peakDetected(false)
 {
+    for (uint8_t i = 0; i < 2; i++)
+    {
+        heartTiming[i] = 0;
+    }
     /*for (uint8_t i = 0; i < BUFFERSIZE; i++)
     {
         analogBuffer[i] = 0;
@@ -33,12 +37,62 @@ void readEKG::filter()
     mem2 = mem1;
     mem1 = mem0;
 
-    if(y<0){
+    if (y < 0)
+    {
         y = 0.0;
     }
     filteredBuffer[mFilterIndex] = uint16_t(y);
+
+    if (filteredBuffer[mFilterIndex] < 1000)
+    {
+        switch (mFilterIndex)
+        {
+        case 0:
+            if (filteredBuffer[mFilterIndex] < filteredBuffer[BUFFERSIZE])
+            {
+                calculateHeartRate();
+                peakDetected = true;
+            }
+            else
+            {
+                peakDetected = false;
+            }
+            break;
+
+        default:
+            if (filteredBuffer[mFilterIndex] < filteredBuffer[mFilterIndex - 1])
+            {
+                calculateHeartRate();
+                peakDetected = true;
+            }
+            else
+            {
+                peakDetected = false;
+            }
+            break;
+        }
+    }
+
     mFilterIndex++;
     mFilterIndex %= BUFFERSIZE;
+}
+
+void readEKG::calculateHeartRate()
+{
+    if (!peakDetected)
+    {
+        heartTiming[1] = mFilterIndex;
+        if (heartTiming[1] > heartTiming[0])
+        {
+            heartRate = (heartTiming[1] - heartTiming[0]) * EKG_SAMPLING_TIME_MS;
+        }
+        else
+        {
+            heartRate = BUFFERSIZE - heartTiming[0] + heartTiming[1];
+        }
+        heartTiming[0] = heartTiming[1];
+        Serial.printf("HR: %d\n", heartRate);
+    }
 }
 
 /* getter for the value at the current read index */
@@ -64,6 +118,11 @@ uint16_t readEKG::getFilterIndex()
 uint16_t readEKG::getWriteIndex()
 {
     return mWriteIndex;
+}
+
+uint16_t readEKG::getHeartRate()
+{
+    return heartRate;
 }
 
 /* prepare data of the first half of the buffer for transmit */

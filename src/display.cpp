@@ -33,6 +33,14 @@ void display::draw()
         mXposFloat = mXposFloat + float(MAX_X_VALUE) * float(EKG_SAMPLING_TIME_MS) / float(GRAPH_TIME_MS);
         mXpos = int(mXposFloat);
     }
+    mDisplay.setTextAlignment(TEXT_ALIGN_LEFT);
+    for(uint8_t x = 10; x < MAX_X_VALUE; x++){
+        for(uint8_t y = 50; y < MAX_Y_VALUE; y++){
+            mDisplay.clearPixel(x, y);
+        }
+    }
+    mDisplay.drawString(10, 50, "HR: " + String(mEKG.getHeartRate()));
+
     mDisplay.display(); /* display last drawings */
     
     /* reached right edge of the display */

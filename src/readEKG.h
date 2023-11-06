@@ -37,6 +37,11 @@ private:
     double mem1;
     double mem2;
 
+    void calculateHeartRate();
+    bool peakDetected;
+    uint16_t heartTiming[2];
+    uint16_t heartRate;
+
 public:
     readEKG();
     void measure();
@@ -45,6 +50,7 @@ public:
     uint16_t getReadIndex();
     uint16_t getFilterIndex();
     uint16_t getWriteIndex();
+    uint16_t getHeartRate();
     void transmitFirst();
     void transmitFirstFiltered();
     void transmitSecond();
