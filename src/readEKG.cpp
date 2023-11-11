@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "readEKG.h"
 
-readEKG::readEKG() : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0), peakDetected(false)
+readEKG::readEKG(uint32_t &counter) : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0), peakDetected(false), lastTiming(0), counter4ms(counter)
 {
     for (uint8_t i = 0; i < 2; i++)
     {
@@ -43,7 +43,7 @@ void readEKG::filter()
     }
     filteredBuffer[mFilterIndex] = uint16_t(y);
 
-    if (filteredBuffer[mFilterIndex] < 1000)
+    if (filteredBuffer[mFilterIndex] < 800)
     {
         switch (mFilterIndex)
         {
@@ -51,6 +51,7 @@ void readEKG::filter()
             if (filteredBuffer[mFilterIndex] < filteredBuffer[BUFFERSIZE])
             {
                 calculateHeartRate();
+                Serial.println("Boarder");
                 peakDetected = true;
             }
             else
@@ -81,17 +82,14 @@ void readEKG::calculateHeartRate()
 {
     if (!peakDetected)
     {
-        heartTiming[1] = mFilterIndex;
-        if (heartTiming[1] > heartTiming[0])
+        if ((counter4ms - heartTiming[0]) > 50)
         {
+            heartTiming[1] = counter4ms;
             heartRate = (heartTiming[1] - heartTiming[0]) * EKG_SAMPLING_TIME_MS;
+            //lastTiming = counter4ms;
+            heartTiming[0] = heartTiming[1];
+            Serial.printf("HR: %d\n", heartRate);
         }
-        else
-        {
-            heartRate = BUFFERSIZE - heartTiming[0] + heartTiming[1];
-        }
-        heartTiming[0] = heartTiming[1];
-        Serial.printf("HR: %d\n", heartRate);
     }
 }
 

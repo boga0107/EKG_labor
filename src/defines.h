@@ -3,7 +3,7 @@
 #define DEFINES_H
 
 #define EKG_SAMPLING_TIME_MS 4
-#define GRAPH_TIME_MS 1500
+#define GRAPH_TIME_MS 2500
 #define DISPLAY_PERIOD_MS 8 // Periode der Displayausgabe
 #define TEST_OUT 26
 #define EN_EKG 17

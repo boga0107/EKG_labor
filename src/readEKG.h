@@ -41,9 +41,11 @@ private:
     bool peakDetected;
     uint16_t heartTiming[2];
     uint16_t heartRate;
+    uint32_t lastTiming;
+    uint32_t &counter4ms;
 
 public:
-    readEKG();
+    readEKG(uint32_t &counter);
     void measure();
     void filter();
     void getValue(uint16_t &pValue);

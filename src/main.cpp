@@ -41,7 +41,7 @@ bool flagRead = false;
 bool flagUDPSend = true; // Scheduling des Verschickens per UDP
 
 /* Klassen */
-readEKG myEKG;
+readEKG myEKG(counter4ms);
 display myDisp(myDisplay, myEKG);
 
 /* Funktionen */

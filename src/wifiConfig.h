@@ -16,7 +16,7 @@ void sendData(uint8_t &pData);
 
 typedef struct
 {
-#define GABRIEL_HOME
+#define GABRIEL_PHONE
 #ifdef LABOR
     const char *wifiSSID = "FRITZ!Box 7590 VL";
     const char *wifiPAS = "56616967766283031728";

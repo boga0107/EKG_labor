@@ -1,12 +1,13 @@
 close all
 clear
+clc
 
 
 T_A = 4e-3;
 f_A = 1/T_A;
-ESPipAdresse = "192.168.2.124";
+ESPipAdresse = "192.168.131.89";
 ESPudpPort = 123;
-BUFFERSIZE = 7500;
+BUFFERSIZE = 15000;
 data_sum = 0;
 t = linspace(0,30,BUFFERSIZE);
 UnFilteredPort = 2020;
@@ -35,19 +36,19 @@ filtered = false;
 while true
      uReceiver1Count = uReceiver1.NumBytesAvailable;
      uReceiver2Count = uReceiver2.NumBytesAvailable;
-     if  uReceiver1Count > 1
+     if  uReceiver1Count > 1 && unfiltered == false
         data(n,:) = read(uReceiver1, 1, "uint16");
         %data_sum = data_sum + data(n);
         n = n+1
-        if n == 7501
+        if n == BUFFERSIZE + 1
             unfiltered = true;
         end
      end
-     if uReceiver2Count > 1
+     if uReceiver2Count > 1 && filtered == false
          dataFiltered(m,:) = read(uReceiver2, 1, "uint16");
          %data_sum = data_sum + data(m);
          m = m+1
-         if m == 7501
+         if m == BUFFERSIZE + 1
              filtered = true;
          end
      end
@@ -105,3 +106,5 @@ grid
 dataOut = [data dataFiltered data-dataFiltered];
 
 save("uC_data.mat", "dataOut")
+
+run("heart_rate.mlx")
