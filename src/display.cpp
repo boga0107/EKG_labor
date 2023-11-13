@@ -39,7 +39,8 @@ void display::draw()
             mDisplay.clearPixel(x, y);
         }
     }
-    mDisplay.drawString(10, 50, "HR: " + String(mEKG.getHeartRate()));
+    mDisplay.drawString(5, 50, "HR: " + String(uint16_t(mEKG.getHeartRate())) + "bpm");
+    mDisplay.drawString(70, 50, "HRV: " + String(uint16_t(mEKG.getHRV())) + "ms");
 
     mDisplay.display(); /* display last drawings */
     

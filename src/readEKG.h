@@ -32,6 +32,7 @@ private:
     uint16_t mWriteIndex;
     uint16_t mFilterIndex;
     uint16_t mReadIndex;
+    uint16_t mVariabilityIndex;
 
     double mem0;
     double mem1;
@@ -40,7 +41,9 @@ private:
     void calculateHeartRate();
     bool peakDetected;
     uint16_t heartTiming[2];
-    uint16_t heartRate;
+    uint16_t heartPeriod[2];
+    uint16_t variability;
+    float heartRate;
     uint32_t lastTiming;
     uint32_t &counter4ms;
 
@@ -52,7 +55,8 @@ public:
     uint16_t getReadIndex();
     uint16_t getFilterIndex();
     uint16_t getWriteIndex();
-    uint16_t getHeartRate();
+    float getHeartRate();
+    uint16_t getHRV();
     void transmitFirst();
     void transmitFirstFiltered();
     void transmitSecond();

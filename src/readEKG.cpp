@@ -1,12 +1,14 @@
 #include <Arduino.h>
 #include "readEKG.h"
 
-readEKG::readEKG(uint32_t &counter) : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0), peakDetected(false), lastTiming(0), counter4ms(counter)
+readEKG::readEKG(uint32_t &counter) : mWriteIndex(0), mReadIndex(0), mFilterIndex(0), mem0(0.0), mem1(0.0), mem2(0.0), peakDetected(false), lastTiming(0), counter4ms(counter), mVariabilityIndex(0)
 {
     for (uint8_t i = 0; i < 2; i++)
     {
         heartTiming[i] = 0;
+        heartPeriod[i] = 0;
     }
+
     /*for (uint8_t i = 0; i < BUFFERSIZE; i++)
     {
         analogBuffer[i] = 0;
@@ -85,8 +87,12 @@ void readEKG::calculateHeartRate()
         if ((counter4ms - heartTiming[0]) > 50)
         {
             heartTiming[1] = counter4ms;
-            heartRate = (heartTiming[1] - heartTiming[0]) * EKG_SAMPLING_TIME_MS;
-            //lastTiming = counter4ms;
+            heartPeriod[1] = (heartTiming[1] - heartTiming[0]) * EKG_SAMPLING_TIME_MS;
+            heartRate = 60000.0 / float(heartPeriod[mVariabilityIndex]);
+            variability = abs(heartPeriod[1] - heartPeriod[0]);
+
+            // lastTiming = counter4ms;
+            heartPeriod[0] = heartPeriod[1];
             heartTiming[0] = heartTiming[1];
             Serial.printf("HR: %d\n", heartRate);
         }
@@ -118,9 +124,14 @@ uint16_t readEKG::getWriteIndex()
     return mWriteIndex;
 }
 
-uint16_t readEKG::getHeartRate()
+float readEKG::getHeartRate()
 {
     return heartRate;
+}
+
+uint16_t readEKG::getHRV()
+{
+    return variability;
 }
 
 /* prepare data of the first half of the buffer for transmit */

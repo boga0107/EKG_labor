@@ -5,9 +5,9 @@ clc
 
 T_A = 4e-3;
 f_A = 1/T_A;
-ESPipAdresse = "192.168.131.89";
+ESPipAdresse = "192.168.2.124";
 ESPudpPort = 123;
-BUFFERSIZE = 15000;
+BUFFERSIZE = 7500;
 data_sum = 0;
 t = linspace(0,30,BUFFERSIZE);
 UnFilteredPort = 2020;
@@ -107,4 +107,4 @@ dataOut = [data dataFiltered data-dataFiltered];
 
 save("uC_data.mat", "dataOut")
 
-run("heart_rate.mlx")
+%run("heart_rate.mlx")
