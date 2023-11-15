@@ -16,11 +16,11 @@ FilteredPort = 0202;
 testVar = 777;
 
 % Initialisierung
-uBroadcaster = udpport("datagram")
+uBroadcaster = udpport("datagram");
 uBroadcaster.EnableBroadcast = true;
 
-uReceiver1 = udpport("byte", "LocalPort",UnFilteredPort, "EnablePortSharing",true)
-uReceiver2 = udpport("byte", "LocalPort",FilteredPort, "EnablePortSharing",true)
+uReceiver1 = udpport("byte", "LocalPort",UnFilteredPort, "EnablePortSharing",true);
+uReceiver2 = udpport("byte", "LocalPort",FilteredPort, "EnablePortSharing",true);
 
 
 write(uBroadcaster, testVar, "uint16", ESPipAdresse, ESPudpPort);
@@ -39,7 +39,7 @@ while true
      if  uReceiver1Count > 1 && unfiltered == false
         data(n,:) = read(uReceiver1, 1, "uint16");
         %data_sum = data_sum + data(n);
-        n = n+1
+        n = n+1;
         if n == BUFFERSIZE + 1
             unfiltered = true;
         end
@@ -47,7 +47,7 @@ while true
      if uReceiver2Count > 1 && filtered == false
          dataFiltered(m,:) = read(uReceiver2, 1, "uint16");
          %data_sum = data_sum + data(m);
-         m = m+1
+         m = m+1;
          if m == BUFFERSIZE + 1
              filtered = true;
          end
@@ -69,7 +69,7 @@ F_dataFiltered = F_dataFiltered/length(F_dataFiltered);
 x_f = linspace(0, f_A, length(F_data)+1);
 x_f = x_f(1:end-1);
 
-
+spectrum = figure;
 subplot(2,1,1)
 plot(t, data)
 hold
@@ -78,19 +78,20 @@ grid
 xlim([0 5])
 xlabel("t[s]")
 title("Signal")
-legend("Eingangssignal", "Ausgangssignal")
+legend("Eingangssignal", "Ausgangssignal", Location="southeast")
 
 
 subplot(2,1,2)
 plot(x_f, F_data)
 hold
 plot(x_f, F_dataFiltered)
-ylim([0 100])
+ylim([0 40])
 xlabel("t[s]")
 title("Signal")
 legend("Eingangsspektrum", "Ausgangsspektrum")
+saveas(spectrum, 'spektrum.png')
 
-figure
+difference = figure;
 subplot(3,1,1)
 plot(t, data)
 grid
@@ -102,6 +103,8 @@ grid
 subplot(3,1,3)
 plot(t, data - dataFiltered)
 grid
+
+saveas(difference, "difference.png")
 
 dataOut = [data dataFiltered data-dataFiltered];
 

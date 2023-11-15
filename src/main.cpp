@@ -115,7 +115,7 @@ void loop()
   /* UDP send first half of buffer */
   if (myEKG.getFilterIndex() >= BUFFERSIZE / 2 && flagUDPSend)
   {
-    Serial.printf("Send first!\t- %d\n", counter4ms * 4);
+    Serial.printf("Send first!\t- %d\n", counter4ms * EKG_SAMPLING_TIME_MS);
     myEKG.transmitFirst();
     myEKG.transmitFirstFiltered();
     flagUDPSend = false;
@@ -124,7 +124,7 @@ void loop()
   /* UDP send second half of buffer */
   if (myEKG.getFilterIndex() < BUFFERSIZE / 2 && !flagUDPSend)
   {
-    Serial.printf("Send second!\t- %d\n", counter4ms * 4);
+    Serial.printf("Send second!\t- %d\n", counter4ms * EKG_SAMPLING_TIME_MS);
     myEKG.transmitSecond();
     myEKG.transmitSecondFiltered();
     flagUDPSend = true;

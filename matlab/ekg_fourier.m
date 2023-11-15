@@ -74,14 +74,14 @@ F_dataNumFilter = transpose(abs(fft(dataNumFilter)));
 dataNumFilter = transpose(dataNumFilter);
 
 %createfigureIIR(t, [data dataNumFilter], x_f, [F_data F_dataNumFilter])
-
+filter = figure;
 subplot(2,1,1)
 plot(t, data)
-title("IIR-Filter")
+%title("IIR-Filter")
 grid
 hold
-%plot(t, dataFiltered)
-plot(t, dataNumFilter)
+plot(t, dataFiltered)
+%plot(t, dataNumFilter)
 xlim([0 2])
 ylim([0 2750])
 xlabel("t[s]")
@@ -93,12 +93,12 @@ plot(x_f, F_data)
 grid
 hold
 %xlim([0 60])
-ylim([0 1e6])
-%plot(x_f, abs(F_dataFiltered))
-plot(x_f, F_dataNumFilter)
+ylim([0 5e5])
+plot(x_f, abs(F_dataFiltered))
+%plot(x_f, F_dataNumFilter)
 xlabel("f[Hz]")
 ylabel("|FFT(u)|")
 subtitle("Spektrum")
 legend("Eingangsspektrum", "Ausgangsspektrum")
 
-
+saveas(filter, "filter.png")
